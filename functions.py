@@ -27,124 +27,57 @@ def leer_recetas(ruta):
 
 
 def read_recipes(nombre, ruta_recetas):
-    categoria = int(input("Deberás elegir una categoría:\n"
-                          "1.Carnes\n"
-                          "2.Ensaladas\n"
-                          "3.Pastas\n"
-                          "4.Postres\n"
-                          "Categoría: ""\n"))
+    categorias = {}
+    clave_cat = 1
+    directorio_categorias = Path(ruta_recetas)
+    diccionario_completo = {}
+    print("Deberás seleccionar una categoría: ")
+    # For para mostrar las categorías disponibles de manera dinámica
+    for categoria in directorio_categorias.iterdir():
+        if categoria.is_dir():
+            categorias[clave_cat] = categoria.name
+            clave_cat += 1
+    for clave, valor in categorias.items():
+        print(clave, valor)
 
-    # Carnes
-    if categoria == 1:
-        directorio = Path(ruta_recetas, 'Carnes')
-        recetas = {}
-        clave = 1
-        print(f"¿Qué receta quieres leer, {nombre}?")
-        for archivo in directorio.iterdir():
-            if archivo.is_file():
-                recetas[clave] = archivo.name
-                clave += 1
+    # For para alimentar el diccionario completo
+    for clave, nombre_categoria in categorias.items():
+        # Construir la ruta completa de la categoría
+        ruta_categoria = directorio_categorias / nombre_categoria
 
-        for clave, valor in recetas.items():
-            print(clave, valor)
+        # Crear el subdiccionario de recetas
+        recetas = {
+            receta_id + 1: receta.name  # Clave: número incremental, Valor: nombre del archivo
+            for receta_id, receta in enumerate(ruta_categoria.iterdir())
+            if receta.is_file()
+        }
 
-        try:
-            receta = int(input("Respuesta: "))
-            if receta not in recetas:
-                print("Clave no válida")
-            else:
-                print(f"Receta seleccionada: {recetas[receta]}")
-                archivo_seleccionado = recetas[receta]
-                ruta_archivo = directorio / archivo_seleccionado
-                with open(ruta_archivo, 'r') as archivo:
-                    print(archivo.read())
+        # Añadir la categoría y su subdiccionario al diccionario completo
+        diccionario_completo[clave] = recetas
 
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
+    seleccion_categoria = int(input("Respuesta: "))
 
-    # Ensaladas
-    if categoria == 2:
-        directorio = Path(ruta_recetas, 'Ensaladas')
-        recetas = {}
-        clave = 1
-        print(f"¿Qué receta quieres leer, {nombre}?")
-        for archivo in directorio.iterdir():
-            if archivo.is_file():
-                recetas[clave] = archivo.name
-                clave += 1
+    if seleccion_categoria in diccionario_completo:
+        recetas = diccionario_completo[seleccion_categoria]
+        ruta = directorio_categorias / categorias[seleccion_categoria]
+        print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. Estas son sus recetas: ")
 
         for clave, valor in recetas.items():
-            print(clave, valor)
+            print(f"{clave}: {valor}")
 
-        try:
-            receta = int(input("Respuesta: "))
-            if receta not in recetas:
-                print("Clave no válida")
-            else:
-                print(f"Receta seleccionada: {recetas[receta]}")
-                archivo_seleccionado = recetas[receta]
-                ruta_archivo = directorio / archivo_seleccionado
-                with open(ruta_archivo, 'r') as archivo:
-                    print(archivo.read())
+        # Selección de recetas
 
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
+        seleccion_receta = int(input(f"{nombre}, introduce un número de receta para leerla: "))
 
-    # Pastas
-    if categoria == 3:
-        directorio = Path(ruta_recetas, 'Pastas')
-        recetas = {}
-        clave = 1
-        print(f"¿Qué receta quieres leer, {nombre}?")
-        for archivo in directorio.iterdir():
-            if archivo.is_file():
-                recetas[clave] = archivo.name
-                clave += 1
+        if seleccion_receta in recetas:
+            print(f"A continuación se mostrará la receta de {recetas[seleccion_receta]}: ")
+            archivo_seleccionado = recetas[seleccion_receta]
+            ruta_archivo = ruta / archivo_seleccionado
+            with open(ruta_archivo, 'r') as archivo:
+                print(archivo.read())
 
-        for clave, valor in recetas.items():
-            print(clave, valor)
-
-        try:
-            receta = int(input("Respuesta: "))
-            if receta not in recetas:
-                print("Clave no válida")
-            else:
-                print(f"Receta seleccionada: {recetas[receta]}")
-                archivo_seleccionado = recetas[receta]
-                ruta_archivo = directorio / archivo_seleccionado
-                with open(ruta_archivo, 'r') as archivo:
-                    print(archivo.read())
-
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
-
-    # Postres
-    if categoria == 4:
-        directorio = Path(ruta_recetas, 'Postres')
-        recetas = {}
-        clave = 1
-        print(f"¿Qué receta quieres leer, {nombre}?")
-        for archivo in directorio.iterdir():
-            if archivo.is_file():
-                recetas[clave] = archivo.name
-                clave += 1
-
-        for clave, valor in recetas.items():
-            print(clave, valor)
-
-        try:
-            receta = int(input("Respuesta: "))
-            if receta not in recetas:
-                print("Clave no válida")
-            else:
-                print(f"Receta seleccionada: {recetas[receta]}")
-                archivo_seleccionado = recetas[receta]
-                ruta_archivo = directorio / archivo_seleccionado
-                with open(ruta_archivo, 'r') as archivo:
-                    print(archivo.read())
-
-        except ValueError:
-            print("Por favor, ingresa un número válido.")
+    else:
+        print("Valor introducido no válido.")
 
 
 def introducir_opcion(nombre):
@@ -176,7 +109,7 @@ def create_recipes(nombre, ruta_recetas):
     if categoria == 1:
         directorio = 'Carnes'
         receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo')
+        archivo = input('Pon nombre al archivo: ')
         ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
         with open(ruta_archivo, 'w') as nueva_receta:
             nueva_receta.write(receta)
@@ -185,7 +118,7 @@ def create_recipes(nombre, ruta_recetas):
     if categoria == 2:
         directorio = 'Ensaladas'
         receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo')
+        archivo = input('Pon nombre al archivo: ')
         ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
         with open(ruta_archivo, 'w') as nueva_receta:
             nueva_receta.write(receta)
@@ -194,10 +127,11 @@ def create_recipes(nombre, ruta_recetas):
     if categoria == 3:
         directorio = 'Pastas'
         receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo')
+        archivo = input('Pon nombre al archivo: ')
         ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
         with open(ruta_archivo, 'w') as nueva_receta:
             nueva_receta.write(receta)
+        print("Receta creada con éxito")
 
     # Postres
     if categoria == 4:
