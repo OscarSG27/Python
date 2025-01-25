@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 
@@ -20,12 +21,6 @@ def contar_archivos(carpeta):
     return contador
 
 
-def leer_recetas(ruta):
-    with open(ruta, "r") as archivo:
-        contenido = archivo.read()
-        return contenido
-
-
 def read_recipes(nombre, ruta_recetas):
     categorias = {}
     clave_cat = 1
@@ -39,6 +34,7 @@ def read_recipes(nombre, ruta_recetas):
             clave_cat += 1
     for clave, valor in categorias.items():
         print(clave, valor)
+    print("Pulsa V para volver al inicio")
 
     # For para alimentar el diccionario completo
     for clave, nombre_categoria in categorias.items():
@@ -55,29 +51,44 @@ def read_recipes(nombre, ruta_recetas):
         # Añadir la categoría y su subdiccionario al diccionario completo
         diccionario_completo[clave] = recetas
 
-    seleccion_categoria = int(input("Respuesta: "))
+    seleccion_categoria = input("Respuesta: ").upper()
 
-    if seleccion_categoria in diccionario_completo:
-        recetas = diccionario_completo[seleccion_categoria]
-        ruta = directorio_categorias / categorias[seleccion_categoria]
-        print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. Estas son sus recetas: ")
+    if seleccion_categoria.isnumeric():
+        seleccion_categoria = int(seleccion_categoria)
+        if seleccion_categoria in diccionario_completo:
+            recetas = diccionario_completo[seleccion_categoria]
+            ruta = directorio_categorias / categorias[seleccion_categoria]
+            print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. "
+                  f"Estas son sus recetas: ")
 
-        for clave, valor in recetas.items():
-            print(f"{clave}: {valor}")
+            for clave, valor in recetas.items():
+                print(f"{clave}: {valor}")
 
-        # Selección de recetas
+            # Selección de recetas
 
-        seleccion_receta = int(input(f"{nombre}, introduce un número de receta para leerla: "))
+            seleccion_receta = int(input(f"{nombre}, introduce un número de receta para leerla: "))
 
-        if seleccion_receta in recetas:
-            print(f"A continuación se mostrará la receta de {recetas[seleccion_receta]}: ")
-            archivo_seleccionado = recetas[seleccion_receta]
-            ruta_archivo = ruta / archivo_seleccionado
-            with open(ruta_archivo, 'r') as archivo:
-                print(archivo.read())
+            if seleccion_receta in recetas:
+                print(f"A continuación se mostrará la receta de {recetas[seleccion_receta]}: ")
+                archivo_seleccionado = recetas[seleccion_receta]
+                ruta_archivo = ruta / archivo_seleccionado
+                with open(ruta_archivo, 'r') as archivo:
+                    print(archivo.read())
+            return False
+        else:
+            error = True
+            print("Valor introducido no válido.")
+            return error
+
+    # Opción de retorno al inicio por si entramos por error
+
+    elif seleccion_categoria == "V":
+        return True
 
     else:
+        error = True
         print("Valor introducido no válido.")
+        return error
 
 
 def introducir_opcion(nombre):
@@ -92,60 +103,207 @@ def eleccion_letra(nombre):
     return letra
 
 
-def opcion_salir_continuar_read_recipes(nombre, ruta_recetas):
-    read_recipes(nombre, ruta_recetas)
-    print('\n')
-
-
 def create_recipes(nombre, ruta_recetas):
-    categoria = int(input("Deberás elegir una categoría:\n"
-                          "1.Carnes\n"
-                          "2.Ensaladas\n"
-                          "3.Pastas\n"
-                          "4.Postres\n"
-                          "Categoría: ""\n"))
+    categorias = {}
+    clave_cat = 1
+    directorio_categorias = Path(ruta_recetas)
+    diccionario_completo = {}
+    print("Selecciona la categoría: ")
+    # For para mostrar las categorías disponibles de manera dinámica
+    for categoria in directorio_categorias.iterdir():
+        if categoria.is_dir():
+            categorias[clave_cat] = categoria.name
+            clave_cat += 1
+    for clave, valor in categorias.items():
+        print(clave, valor)
 
-    # Carnes
-    if categoria == 1:
-        directorio = 'Carnes'
-        receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo: ')
-        ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
-        with open(ruta_archivo, 'w') as nueva_receta:
-            nueva_receta.write(receta)
+    print("Pulsa V para volver al inicio")
+    # For para alimentar el diccionario completo
+    for clave, nombre_categoria in categorias.items():
+        # Construir la ruta completa de la categoría
+        ruta_categoria = directorio_categorias / nombre_categoria
 
-    # Ensaladas
-    if categoria == 2:
-        directorio = 'Ensaladas'
-        receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo: ')
-        ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
-        with open(ruta_archivo, 'w') as nueva_receta:
-            nueva_receta.write(receta)
+        # Crear el subdiccionario de recetas
+        recetas = {
+            receta_id + 1: receta.name  # Clave: número incremental, Valor: nombre del archivo
+            for receta_id, receta in enumerate(ruta_categoria.iterdir())
+            if receta.is_file()
+        }
 
-    # Pastas
-    if categoria == 3:
-        directorio = 'Pastas'
-        receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo: ')
-        ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
-        with open(ruta_archivo, 'w') as nueva_receta:
-            nueva_receta.write(receta)
-        print("Receta creada con éxito")
+        # Añadir la categoría y su subdiccionario al diccionario completo
+        diccionario_completo[clave] = recetas
 
-    # Postres
-    if categoria == 4:
-        directorio = 'Postres'
-        receta = input(f"Introduce la receta a crear, {nombre}\n""Respuesta: " "\n")
-        archivo = input('Pon nombre al archivo: ')
-        ruta_archivo = os.path.join(ruta_recetas, directorio, archivo)
-        with open(ruta_archivo, 'w') as nueva_receta:
-            nueva_receta.write(receta)
+    seleccion_categoria = input("Respuesta: ").upper()
+
+    if seleccion_categoria.isnumeric():
+        seleccion_categoria = int(seleccion_categoria)
+        if seleccion_categoria in diccionario_completo:
+            print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. "
+                  f"Vas a crear una receta en su interior ")
+            print("Escribe la nueva receta: \n")
+            nueva_receta = input()
+            print("Pon nombre al archivo: \n")
+            archivo = input() + '.txt'
+            ruta = directorio_categorias / categorias[seleccion_categoria]
+            ruta_receta = ruta / archivo
+            with open(ruta_receta, 'w') as receta:
+                receta.write(nueva_receta)
+            print(f"Has creado el nuevo archivo: {archivo}")
+
+            return False
+        else:
+            print("Valor introducido no válido.")
+            return False
+
+    elif seleccion_categoria == "V":
+        return True
+
+    else:
+        print("Valor introducido no válido.")
+        return False
 
 
-def opcion_salir_continuar_create_recipes(nombre, ruta_recetas):
-    create_recipes(nombre, ruta_recetas)
-    print('\n')
+def create_category(nombre, ruta_recetas):
+    print(f"{nombre}, vas a crear una nueva categoría dentro de {ruta_recetas}")
+    seleccion = input("Si te has equivocado, pulsa V para volver al inicio o C para continuar").upper()
+    print("\n")
+
+    if seleccion == "V":
+        return True
+    elif seleccion == "C":
+
+        while True:
+            print("Introduce el nombre del directorio:")
+            nuevo_directorio = input()
+            ruta = Path(ruta_recetas) / nuevo_directorio
+
+            # Comprobar si el directorio ya existe
+            if ruta.exists():
+                print(f"El directorio '{nuevo_directorio}' ya existe. Por favor, elige otro nombre.")
+            else:
+                # Crear el directorio si no existe
+                ruta.mkdir()
+                print(f"El directorio '{nuevo_directorio}' ha sido creado en la ruta '{ruta}'.")
+                break  # Salir del bucle al crear el directorio correctamente
+        return False
+
+
+def remove_recipe(nombre, ruta_recetas):
+    categorias = {}
+    clave_cat = 1
+    directorio_categorias = Path(ruta_recetas)
+    diccionario_completo = {}
+    print("Deberás seleccionar una categoría: ")
+    # For para mostrar las categorías disponibles de manera dinámica
+    for categoria in directorio_categorias.iterdir():
+        if categoria.is_dir():
+            categorias[clave_cat] = categoria.name
+            clave_cat += 1
+    for clave, valor in categorias.items():
+        print(clave, valor)
+
+    print("Pulsa V para volver al inicio")
+
+    # For para alimentar el diccionario completo
+    for clave, nombre_categoria in categorias.items():
+        # Construir la ruta completa de la categoría
+        ruta_categoria = directorio_categorias / nombre_categoria
+
+        # Crear el subdiccionario de recetas
+        recetas = {
+            receta_id + 1: receta.name  # Clave: número incremental, Valor: nombre del archivo
+            for receta_id, receta in enumerate(ruta_categoria.iterdir())
+            if receta.is_file()
+        }
+
+        # Añadir la categoría y su subdiccionario al diccionario completo
+        diccionario_completo[clave] = recetas
+
+    seleccion_categoria = input("Respuesta: ").upper()
+
+    if seleccion_categoria.isnumeric():
+        seleccion_categoria = int(seleccion_categoria)
+        if seleccion_categoria in diccionario_completo:
+            recetas = diccionario_completo[seleccion_categoria]
+            ruta = directorio_categorias / categorias[seleccion_categoria]
+            print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. Estas son sus recetas: ")
+
+            for clave, valor in recetas.items():
+                print(f"{clave}: {valor}")
+
+            # Selección de recetas
+
+            seleccion_receta = int(input(f"{nombre}, introduce un número de receta para eliminarla: "))
+
+            if seleccion_receta in recetas:
+                print(f"A continuación se eliminará la receta de {recetas[seleccion_receta]}: ")
+                archivo_seleccionado = recetas[seleccion_receta]
+                ruta_archivo = ruta / archivo_seleccionado
+                ruta_archivo.unlink()
+                print(f"La receta {archivo_seleccionado} ha sido eliminada")
+            return False
+        else:
+            print("Valor introducido no válido.")
+            return False
+
+    elif seleccion_categoria == "V":
+        return True
+
+    else:
+        print("Valor introducido no válido.")
+        return False
+
+
+def remove_category(nombre, ruta_recetas):
+    categorias = {}
+    clave_cat = 1
+    directorio_categorias = Path(ruta_recetas)
+    diccionario_completo = {}
+    print("Deberás seleccionar la categoría que quieres eliminar: ")
+    # For para mostrar las categorías disponibles de manera dinámica
+    for categoria in directorio_categorias.iterdir():
+        if categoria.is_dir():
+            categorias[clave_cat] = categoria.name
+            clave_cat += 1
+    for clave, valor in categorias.items():
+        print(clave, valor)
+    print("Pulsa V para volver al inicio")
+
+    # For para alimentar el diccionario completo
+    for clave, nombre_categoria in categorias.items():
+        # Construir la ruta completa de la categoría
+        ruta_categoria = directorio_categorias / nombre_categoria
+
+        # Crear el subdiccionario de recetas
+        recetas = {
+            receta_id + 1: receta.name  # Clave: número incremental, Valor: nombre del archivo
+            for receta_id, receta in enumerate(ruta_categoria.iterdir())
+            if receta.is_file()
+        }
+
+        # Añadir la categoría y su subdiccionario al diccionario completo
+        diccionario_completo[clave] = recetas
+
+    seleccion_categoria = input("Respuesta: ").upper()
+
+    if seleccion_categoria.isnumeric():
+        seleccion_categoria = int(seleccion_categoria)
+        if seleccion_categoria in diccionario_completo:
+            ruta = directorio_categorias/categorias[seleccion_categoria]
+            print(f"{nombre}, vas a eliminar la categoría: {categorias[seleccion_categoria]}.")
+            shutil.rmtree(ruta)
+            print("Categoría eliminada.")
+            return False
+        else:
+            print("Valor introducido no válido.")
+            return False
+
+    elif seleccion_categoria == "V":
+        return True
+    else:
+        print("Valor introducido no válido.")
+        return False
+
 
 
 
