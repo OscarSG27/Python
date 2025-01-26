@@ -56,39 +56,47 @@ def read_recipes(nombre, ruta_recetas):
     if seleccion_categoria.isnumeric():
         seleccion_categoria = int(seleccion_categoria)
         if seleccion_categoria in diccionario_completo:
+            avanzar = False
             recetas = diccionario_completo[seleccion_categoria]
             ruta = directorio_categorias / categorias[seleccion_categoria]
             print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. "
                   f"Estas son sus recetas: ")
 
-            for clave, valor in recetas.items():
-                print(f"{clave}: {valor}")
+            while not avanzar:
+                for clave, valor in recetas.items():
+                    print(f"{clave}: {valor}")
 
-            # Selección de recetas
+                # Selección de recetas
+                seleccion_receta = input(f"{nombre}, introduce un número de receta para leerla: ")
 
-            seleccion_receta = int(input(f"{nombre}, introduce un número de receta para leerla: "))
+                if seleccion_receta.isnumeric():
+                    seleccion_receta = int(seleccion_receta)
+                    if seleccion_receta in recetas:
+                        print(f"A continuación se mostrará la receta de {recetas[seleccion_receta]}: ")
+                        archivo_seleccionado = recetas[seleccion_receta]
+                        ruta_archivo = ruta / archivo_seleccionado
+                        with open(ruta_archivo, 'r') as archivo:
+                            print(archivo.read())
+                        avanzar = True
+                    else:
+                        print("Código de receta no válido. Prueba de nuevo.")
+                else:
+                    print("Valor no válido, las recetas tienen códigos numéricos.")
 
-            if seleccion_receta in recetas:
-                print(f"A continuación se mostrará la receta de {recetas[seleccion_receta]}: ")
-                archivo_seleccionado = recetas[seleccion_receta]
-                ruta_archivo = ruta / archivo_seleccionado
-                with open(ruta_archivo, 'r') as archivo:
-                    print(archivo.read())
-            return False
+            return {"error": False, "estado": "continuar"}
+
         else:
-            error = True
-            print("Valor introducido no válido.")
-            return error
+            print("Categoría no válida.")
+            return {"error": True, "estado": "no válido"}
 
     # Opción de retorno al inicio por si entramos por error
-
     elif seleccion_categoria == "V":
-        return True
+        return {"error": False, "estado": "volver inicio"}
 
+    # Manejo de cualquier otro caso no válido
     else:
-        error = True
         print("Valor introducido no válido.")
-        return error
+        return {"error": True, "estado": "no válido"}
 
 
 def introducir_opcion(nombre):

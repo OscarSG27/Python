@@ -17,87 +17,124 @@ print(F"El número total de recetas es de: {total_archivos}\n")
 while True:
     try:
         opcion = int(functions.introducir_opcion(nombre))
+
         if opcion in range(1, 7):
+            salir_bucle_principal = False
             while opcion != 6:
                 # Leer recetas
                 if opcion == 1:
-
                     letra = 'C'
                     while letra == 'C':
-                        vuelta_inicio = functions.read_recipes(nombre, ruta_recetas)
-                        error = functions.read_recipes(nombre, ruta_recetas)
+                        resultado = functions.read_recipes(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
-                        if not vuelta_inicio and not error:
+                        if resultado["estado"] == "continuar":
                             print("\n")
                             letra = functions.eleccion_letra(nombre)
-                        elif not vuelta_inicio and error:
+
+                        elif resultado["estado"] == "no válido":
                             functions.read_recipes(nombre, ruta_recetas)
-                        else:
-                            opcion = int(functions.introducir_opcion(nombre))
+
+                        elif resultado["estado"] == "volver inicio":
+                            salir_bucle_principal = True
                             break
 
+                    if salir_bucle_principal:
+                        break
+
                     if letra == 'E':
-                        opcion = int(functions.introducir_opcion(nombre))
+                        break
 
                 # Crear recetas
                 if opcion == 2:
                     letra = 'C'
                     while letra == 'C':
-                        vuelve_inicio = functions.create_recipes(nombre, ruta_recetas)
-                        if not vuelve_inicio:
+                        resultado = functions.create_recipes(nombre, ruta_recetas)
+                        # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
+                        if resultado["estado"] == "continuar":
                             print("\n")
                             letra = functions.eleccion_letra(nombre)
-                        else:
-                            opcion = int(functions.introducir_opcion(nombre))
+
+                        elif resultado["estado"] == "no válido":
+                            functions.create_recipes(nombre, ruta_recetas)
+
+                        elif resultado["estado"] == "volver inicio":
+                            salir_bucle_principal = True
                             break
 
+                    if salir_bucle_principal:
+                        break
+
                     if letra == 'E':
-                        opcion = int(functions.introducir_opcion(nombre))
+                        break
 
                 # Crear categoría
                 if opcion == 3:
                     letra = 'C'
                     while letra == 'C':
-                        vuelve_inicio = functions.create_category(nombre, ruta_recetas)
-                        if not vuelve_inicio:
+                        resultado = functions.create_category(nombre, ruta_recetas)
+                        # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
+                        if resultado["estado"] == "continuar":
                             print("\n")
                             letra = functions.eleccion_letra(nombre)
-                        else:
-                            opcion = int(functions.introducir_opcion(nombre))
+
+                        elif resultado["estado"] == "no válido":
+                            functions.create_category(nombre, ruta_recetas)
+
+                        elif resultado["estado"] == "volver inicio":
+                            salir_bucle_principal = True
                             break
 
+                    if salir_bucle_principal:
+                        break
+
                     if letra == 'E':
-                        opcion = int(functions.introducir_opcion(nombre))
+                        break
 
                 # Eliminar receta
                 if opcion == 4:
                     letra = 'C'
                     while letra == 'C':
-                        vuelve_inicio = functions.remove_recipe(nombre, ruta_recetas)
-                        if not vuelve_inicio:
+                        resultado = functions.remove_recipe(nombre, ruta_recetas)
+                        # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
+                        if resultado["estado"] == "continuar":
                             print("\n")
                             letra = functions.eleccion_letra(nombre)
-                        else:
-                            opcion = int(functions.introducir_opcion(nombre))
+
+                        elif resultado["estado"] == "no válido":
+                            functions.remove_recipe(nombre, ruta_recetas)
+
+                        elif resultado["estado"] == "volver inicio":
+                            salir_bucle_principal = True
                             break
 
+                    if salir_bucle_principal:
+                        break
+
                     if letra == 'E':
-                        opcion = int(functions.introducir_opcion(nombre))
+                        break
 
                 # Eliminar categoría
                 if opcion == 5:
                     letra = 'C'
                     while letra == 'C':
-                        vuelve_inicio = functions.remove_category(nombre, ruta_recetas)
-                        if not vuelve_inicio:
+                        resultado = functions.remove_category(nombre, ruta_recetas)
+                        # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
+                        if resultado["estado"] == "continuar":
                             print("\n")
                             letra = functions.eleccion_letra(nombre)
-                        else:
-                            opcion = int(functions.introducir_opcion(nombre))
+
+                        elif resultado["estado"] == "no válido":
+                            functions.remove_category(nombre, ruta_recetas)
+
+                        elif resultado["estado"] == "volver inicio":
+                            salir_bucle_principal = True
                             break
 
+                    if salir_bucle_principal:
+                        break
+
                     if letra == 'E':
-                        opcion = int(functions.introducir_opcion(nombre))
+                        break
 
             if opcion == 6:
                 print(F"{nombre}, has salido con éxito del menú")
@@ -105,6 +142,7 @@ while True:
 
         elif opcion not in range(1, 7):
             print("La opción seleccionada no es válida\n")
+            continue
 
     except ValueError:
         print("La opción introducida no es un número.\n")
