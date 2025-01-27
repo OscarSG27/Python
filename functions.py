@@ -158,26 +158,25 @@ def create_recipes(nombre, ruta_recetas):
                 receta.write(nueva_receta)
             print(f"Has creado el nuevo archivo: {archivo}")
 
-            return False
+            return {"error": False, "estado": "continuar"}
         else:
             print("Valor introducido no válido.")
-            return False
-
+            return {"error": True, "estado": "no válido"}
     elif seleccion_categoria == "V":
-        return True
+        return {"error": False, "estado": "volver inicio"}
 
     else:
         print("Valor introducido no válido.")
-        return False
+        return {"error": True, "estado": "no válido"}
 
 
 def create_category(nombre, ruta_recetas):
     print(f"{nombre}, vas a crear una nueva categoría dentro de {ruta_recetas}")
-    seleccion = input("Si te has equivocado, pulsa V para volver al inicio o C para continuar").upper()
+    seleccion = input("Si te has equivocado, pulsa V para volver al inicio o C para continuar: ").upper()
     print("\n")
 
     if seleccion == "V":
-        return True
+        return {"error": False, "estado": "volver inicio"}
     elif seleccion == "C":
 
         while True:
@@ -193,7 +192,10 @@ def create_category(nombre, ruta_recetas):
                 ruta.mkdir()
                 print(f"El directorio '{nuevo_directorio}' ha sido creado en la ruta '{ruta}'.")
                 break  # Salir del bucle al crear el directorio correctamente
-        return False
+        return {"error": False, "estado": "continuar"}
+    else:
+        print("Valor introducido no válido")
+        return {"error": True, "estado": "no válido"}
 
 
 def remove_recipe(nombre, ruta_recetas):
@@ -230,36 +232,48 @@ def remove_recipe(nombre, ruta_recetas):
     seleccion_categoria = input("Respuesta: ").upper()
 
     if seleccion_categoria.isnumeric():
+        avanzar = False
         seleccion_categoria = int(seleccion_categoria)
         if seleccion_categoria in diccionario_completo:
             recetas = diccionario_completo[seleccion_categoria]
             ruta = directorio_categorias / categorias[seleccion_categoria]
-            print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. Estas son sus recetas: ")
+            print(f"{nombre}, has seleccionado la categoría: {categorias[seleccion_categoria]}. "
+                  f"Estas son sus recetas: ")
 
-            for clave, valor in recetas.items():
-                print(f"{clave}: {valor}")
+            while not avanzar:
+                for clave, valor in recetas.items():
+                    print(f"{clave}: {valor}")
 
-            # Selección de recetas
+                # Selección de recetas
 
-            seleccion_receta = int(input(f"{nombre}, introduce un número de receta para eliminarla: "))
+                seleccion_receta = input(f"{nombre}, introduce un número de receta para eliminarla: ")
 
-            if seleccion_receta in recetas:
-                print(f"A continuación se eliminará la receta de {recetas[seleccion_receta]}: ")
-                archivo_seleccionado = recetas[seleccion_receta]
-                ruta_archivo = ruta / archivo_seleccionado
-                ruta_archivo.unlink()
-                print(f"La receta {archivo_seleccionado} ha sido eliminada")
-            return False
+                if seleccion_receta.isnumeric():
+                    seleccion_receta = int(seleccion_receta)
+                    if seleccion_receta in recetas:
+                        print(f"A continuación se eliminará la receta de {recetas[seleccion_receta]}: ")
+                        archivo_seleccionado = recetas[seleccion_receta]
+                        ruta_archivo = ruta / archivo_seleccionado
+                        ruta_archivo.unlink()
+                        print(f"La receta {archivo_seleccionado} ha sido eliminada")
+                        avanzar = True
+                    else:
+                        print("Código de receta no válido. Prueba de nuevo.")
+                else:
+                    print("Deberás seleccionar un valor numérico")
+
         else:
             print("Valor introducido no válido.")
-            return False
+            return {"error": True, "estado": "no válido"}
+
+        return {"error": False, "estado": "continuar"}
 
     elif seleccion_categoria == "V":
-        return True
+        return {"error": False, "estado": "volver inicio"}
 
     else:
         print("Valor introducido no válido.")
-        return False
+        return {"error": True, "estado": "no válido"}
 
 
 def remove_category(nombre, ruta_recetas):
@@ -301,16 +315,16 @@ def remove_category(nombre, ruta_recetas):
             print(f"{nombre}, vas a eliminar la categoría: {categorias[seleccion_categoria]}.")
             shutil.rmtree(ruta)
             print("Categoría eliminada.")
-            return False
+            return {"error": False, "estado": "continuar"}
         else:
             print("Valor introducido no válido.")
-            return False
+            return {"error": True, "estado": "no válido"}
 
     elif seleccion_categoria == "V":
-        return True
+        return {"error": False, "estado": "volver inicio"}
     else:
         print("Valor introducido no válido.")
-        return False
+        return {"error": True, "estado": "no válido"}
 
 
 

@@ -28,11 +28,17 @@ while True:
                         resultado = functions.read_recipes(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
                         if resultado["estado"] == "continuar":
-                            print("\n")
-                            letra = functions.eleccion_letra(nombre)
+                            letra_valida = False
+                            while not letra_valida:
+                                letra = functions.eleccion_letra(nombre)
+                                print(f"Letra seleccionada: {letra}")
+                                if letra not in ["C", "E"]:
+                                    print("Letra no válida")
+                                else:
+                                    letra_valida = True
 
                         elif resultado["estado"] == "no válido":
-                            functions.read_recipes(nombre, ruta_recetas)
+                            continue
 
                         elif resultado["estado"] == "volver inicio":
                             salir_bucle_principal = True
@@ -51,11 +57,17 @@ while True:
                         resultado = functions.create_recipes(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
                         if resultado["estado"] == "continuar":
-                            print("\n")
-                            letra = functions.eleccion_letra(nombre)
+                            letra_valida = False
+                            while not letra_valida:
+                                letra = functions.eleccion_letra(nombre)
+                                print(f"Letra seleccionada: {letra}")
+                                if letra not in ["C", "E"]:
+                                    print("Letra no válida")
+                                else:
+                                    letra_valida = True
 
                         elif resultado["estado"] == "no válido":
-                            functions.create_recipes(nombre, ruta_recetas)
+                            continue
 
                         elif resultado["estado"] == "volver inicio":
                             salir_bucle_principal = True
@@ -74,11 +86,17 @@ while True:
                         resultado = functions.create_category(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
                         if resultado["estado"] == "continuar":
-                            print("\n")
-                            letra = functions.eleccion_letra(nombre)
+                            letra_valida = False
+                            while not letra_valida:
+                                letra = functions.eleccion_letra(nombre)
+                                print(f"Letra seleccionada: {letra}")
+                                if letra not in ["C", "E"]:
+                                    print("Letra no válida")
+                                else:
+                                    letra_valida = True
 
                         elif resultado["estado"] == "no válido":
-                            functions.create_category(nombre, ruta_recetas)
+                            continue
 
                         elif resultado["estado"] == "volver inicio":
                             salir_bucle_principal = True
@@ -97,11 +115,17 @@ while True:
                         resultado = functions.remove_recipe(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
                         if resultado["estado"] == "continuar":
-                            print("\n")
-                            letra = functions.eleccion_letra(nombre)
+                            letra_valida = False
+                            while not letra_valida:
+                                letra = functions.eleccion_letra(nombre)
+                                print(f"Letra seleccionada: {letra}")
+                                if letra not in ["C", "E"]:
+                                    print("Letra no válida")
+                                else:
+                                    letra_valida = True
 
                         elif resultado["estado"] == "no válido":
-                            functions.remove_recipe(nombre, ruta_recetas)
+                            continue
 
                         elif resultado["estado"] == "volver inicio":
                             salir_bucle_principal = True
@@ -120,11 +144,17 @@ while True:
                         resultado = functions.remove_category(nombre, ruta_recetas)
                         # Se evalúa el return de la función para comprobar si se debe ejecutar esta opción
                         if resultado["estado"] == "continuar":
-                            print("\n")
-                            letra = functions.eleccion_letra(nombre)
+                            letra_valida = False
+                            while not letra_valida:
+                                letra = functions.eleccion_letra(nombre)
+                                print(f"Letra seleccionada: {letra}")
+                                if letra not in ["C", "E"]:
+                                    print("Letra no válida")
+                                else:
+                                    letra_valida = True
 
                         elif resultado["estado"] == "no válido":
-                            functions.remove_category(nombre, ruta_recetas)
+                            continue
 
                         elif resultado["estado"] == "volver inicio":
                             salir_bucle_principal = True
@@ -142,7 +172,6 @@ while True:
 
         elif opcion not in range(1, 7):
             print("La opción seleccionada no es válida\n")
-            continue
 
     except ValueError:
         print("La opción introducida no es un número.\n")
