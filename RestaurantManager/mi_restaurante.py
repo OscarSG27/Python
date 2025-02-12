@@ -1,6 +1,13 @@
-from tkinter import  *
+from tkinter import *
+import random
+import datetime
+from tkinter import filedialog, messagebox
 
 operador = ''
+precios_comida = [1.32, 1.65, 2.31, 3.22, 1.22]
+precios_bebida = [0.25, 0.99, 1.21, 1.54, 1.08]
+precios_postres = [1.54, 1.68, 1.32, 1.97, 2.55]
+
 
 def click_boton(valor_boton):
     global operador
@@ -8,11 +15,13 @@ def click_boton(valor_boton):
     visor_calculadora.delete(0, END)
     visor_calculadora.insert(END, operador)
 
+
 def borrar():
     global operador
     # operador = ''
     visor_calculadora.delete(0, END)
     operador = ''
+
 
 def obtener_total():
     global operador
@@ -23,14 +32,112 @@ def obtener_total():
 
 
 def revisar_check(lista_items, variables_items, texto_items):
-  for indice, comida in enumerate(lista_items):
-        if variables_items[indice].get() == 1:
-            lista_items[indice].config(state=NORMAL)
+  for indice,x in enumerate(lista_items):
+    if variables_items[indice].get() == 1:
+        lista_items[indice].config(state=NORMAL)
+        if lista_items[indice].get() == '0':
             lista_items[indice].delete(0, END)
-            lista_items[indice].focus()
-        else:
-            lista_items[indice].config(state=DISABLED)
-            texto_items[indice].set('0')
+        lista_items[indice].focus()
+    else:
+        lista_items[indice].config(state=DISABLED)
+        texto_items[indice].set('0')
+
+
+def calcular_subtotal(texto_items, precios_items):
+    subtotal = sum(float(cantidad.get()) * precio for cantidad, precio in zip(texto_items, precios_items))
+    return subtotal
+
+
+def calcular_total():
+    subtotal_comida = calcular_subtotal(texto_comida, precios_comida)
+    subtotal_bebida = calcular_subtotal(texto_bebidas, precios_bebida)
+    subtotal_postre = calcular_subtotal(texto_postres, precios_postres)
+
+    sub_total = subtotal_comida + subtotal_bebida + subtotal_postre
+    impuesto = sub_total * 0.10
+
+    total = sub_total + impuesto
+    var_precio_comida.set(f'{round(subtotal_comida,2)} €')
+    var_precio_bebida.set(f'{round(subtotal_bebida,2)} €')
+    var_precio_postres.set(f'{round(subtotal_postre,2)} €')
+    var_subtotal.set(f'{round(sub_total, 2)} €')
+    var_iva.set(f'{round(impuesto, 2)} €')
+    var_precio_total.set(f'{round(total,2)} €')
+
+
+def recibo():
+    texto_recibo.delete(1.0, END)
+    num_recibo = f'N# - {random.randint(1000, 9999)}'
+    fecha = datetime.datetime.now()
+    fecha_recibo = f'{fecha.day}/{fecha.month}/{fecha.year} - {fecha.hour}:{fecha.minute}'
+    texto_recibo.insert(END, f'Datos: \t{num_recibo}\t\t{fecha_recibo}\n')
+    texto_recibo.insert(END, '*' * 60 + '\n')
+    texto_recibo.insert(END, 'Items\t\tCant.\tCoste Items\n')
+    texto_recibo.insert(END, f'-' * 72 + '\n')
+
+    for i, comida in enumerate(texto_comida):
+        if comida.get() != '0':
+            texto_recibo.insert(END, f'{lista_comidas[i].capitalize()}\t\t{comida.get()}\t'
+                                     f'€{round(int(comida.get()) * precios_comida[i], 2)}\n')
+
+    for i, bebida in enumerate(texto_bebidas):
+        if bebida.get() != '0':
+            texto_recibo.insert(END, f'{lista_bebidas[i].capitalize()}\t\t{bebida.get()}\t'
+                                     f'€{round(int(bebida.get()) * precios_bebida[i], 2)}\n')
+
+    for i, postre in enumerate(texto_postres):
+        if postre.get() != '0':
+            texto_recibo.insert(END, f'{lista_postres[i].capitalize()}\t\t{postre.get()}\t'
+                                     f'€{round(int(postre.get()) * precios_postres[i], 2)}\n')
+
+    texto_recibo.insert(END, f'-' * 72 + '\n')
+    texto_recibo.insert(END, f'Subtotal: \t\t\t{var_subtotal.get()}\n')
+    texto_recibo.insert(END, f'-' * 72 + '\n')
+    texto_recibo.insert(END, f'Iva del 10%: \t\t\t{var_iva.get()}\n')
+    texto_recibo.insert(END, f'-' * 72 + '\n')
+    texto_recibo.insert(END, f'Total con impuestos: \t\t\t{var_precio_total.get()}\n')
+    texto_recibo.insert(END, '*' * 60 + '\n')
+    texto_recibo.insert(END, 'Gracias por su visita')
+
+
+def resetear_recibo():
+    texto_recibo.delete(1.0, END)
+    for texto in texto_comida:
+        texto.set('0')
+    for texto in texto_bebidas:
+        texto.set('0')
+    for texto in texto_postres:
+        texto.set('0')
+
+    for cuadro in cuadros_comida:
+        cuadro.config(state=DISABLED)
+    for cuadro in cuadros_bebidas:
+        cuadro.config(state=DISABLED)
+    for cuadro in cuadros_postres:
+        cuadro.config(state=DISABLED)
+
+    for v in variables_comida:
+        v.set(0)
+    for v in variables_bebidas:
+        v.set(0)
+    for v in variables_postres:
+        v.set(0)
+
+    var_precio_comida.set('')
+    var_precio_bebida.set('')
+    var_precio_postres.set('')
+    var_subtotal.set('')
+    var_iva.set('')
+    var_precio_total.set('')
+
+
+def guardar():
+    info_recibo = texto_recibo.get(1.0, END)
+    archivo = filedialog.asksaveasfile(mode='w', defaultextension='.txt')
+    archivo.write(info_recibo)
+    archivo.close()
+    messagebox.showinfo('Información', 'Su recibo ha sido guardado')
+
 
 
 
@@ -123,14 +230,15 @@ for com in lista_comidas:
                 sticky=W)
 
     # Crear las cantidades
-    texto_var = StringVar()
-    texto_var.set('0')
-    texto_comida.append(texto_var)
+    comida_texto_var = StringVar()
+    comida_texto_var.set('0')
+    texto_comida.append(comida_texto_var)
     cuadros_comida.append(Entry(panel_comidas, font=('Dosis', 18, 'bold'),
                                 bd=1,
                                 width=6,
                                 state=DISABLED,
-                                textvariable= texto_var))
+                                textvariable=comida_texto_var))
+
     cuadros_comida[contador].grid(row=contador,
                                   column=1)
     contador += 1
@@ -149,14 +257,14 @@ for com in lista_bebidas:
     bebidas.grid(row=contador, column=0, sticky=W)
 
     # Crear las cantidades
-    texto_var = StringVar()
-    texto_var.set('0')
-    texto_bebidas.append(texto_var)
+    bebida_texto_var = StringVar()
+    bebida_texto_var.set('0')
+    texto_bebidas.append(bebida_texto_var)
     cuadros_bebidas.append(Entry(panel_bebidas, font=('Dosis', 18, 'bold'),
                                 bd=1,
                                 width=6,
                                 state=DISABLED,
-                                textvariable= texto_var))
+                                textvariable= bebida_texto_var))
     cuadros_bebidas[contador].grid(row=contador,
                                    column=1)
     contador += 1
@@ -181,14 +289,14 @@ for com in lista_postres:
                  sticky=W)
 
     # Crear las cantidades
-    texto_var = StringVar()
-    texto_var.set('0')
-    texto_postres.append(texto_var)
+    postres_texto_var = StringVar()
+    postres_texto_var.set('0')
+    texto_postres.append(postres_texto_var)
     cuadros_postres.append(Entry(panel_postres, font=('Dosis', 18, 'bold'),
                                 bd=1,
                                 width=6,
                                 state=DISABLED,
-                                textvariable= texto_var))
+                                textvariable= postres_texto_var))
     cuadros_postres[contador].grid(row=contador,
                                   column=1)
     contador += 1
@@ -294,6 +402,7 @@ texto_precio_total.grid(row=2, column=3, padx=41)
 
 # Botones
 botones = ['total', 'recibo', 'guardar', 'resetear']
+botones_creados = []
 columnas = 0
 for boton in botones:
     boton = Button(panel_botones,
@@ -305,6 +414,21 @@ for boton in botones:
                    width=8)
     boton.grid(row=0, column=columnas)
     columnas += 1
+    botones_creados.append(boton)
+
+# Asignar acción al botón Total
+botones_creados[0].config(command=calcular_total)
+
+# Asignar acción al botón recibo
+botones_creados[1].config(command=recibo)
+
+# Asignar acción al botón guardar
+botones_creados[2].config(command=guardar)
+
+# ASignar acción al botón resetar
+botones_creados[3].config(command=resetear_recibo)
+
+
 
 # area recibo
 texto_recibo = Text(panel_recibo,
